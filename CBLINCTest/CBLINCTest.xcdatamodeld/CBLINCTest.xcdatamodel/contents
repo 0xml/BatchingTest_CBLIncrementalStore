@@ -4,9 +4,15 @@
         <attribute name="name" optional="YES" attributeType="String">
             <userInfo/>
         </attribute>
+        <relationship name="image" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Image" inverseName="contact" inverseEntity="Image" syncable="YES"/>
         <userInfo/>
     </entity>
+    <entity name="Image" syncable="YES">
+        <attribute name="image" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <relationship name="contact" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Contact" inverseName="image" inverseEntity="Contact" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="Contact" positionX="261" positionY="189" width="128" height="60"/>
+        <element name="Contact" positionX="261" positionY="189" width="128" height="73"/>
+        <element name="Image" positionX="432" positionY="189" width="128" height="73"/>
     </elements>
 </model>

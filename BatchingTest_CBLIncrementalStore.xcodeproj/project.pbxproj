@@ -17,6 +17,7 @@
 		E56C00D41CB698BC007A37D5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E56C00D31CB698BC007A37D5 /* Assets.xcassets */; };
 		E56C00D71CB698BC007A37D5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E56C00D51CB698BC007A37D5 /* LaunchScreen.storyboard */; };
 		E56C00E01CB69A35007A37D5 /* CBLIncrementalStore.m in Sources */ = {isa = PBXBuildFile; fileRef = E56C00DF1CB69A35007A37D5 /* CBLIncrementalStore.m */; };
+		E5B53E7B1CB7E4BE00248E7B /* 1000.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = E5B53E7A1CB7E4BE00248E7B /* 1000.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 		E56C00D81CB698BC007A37D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E56C00DE1CB69A35007A37D5 /* CBLIncrementalStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLIncrementalStore.h; sourceTree = "<group>"; };
 		E56C00DF1CB69A35007A37D5 /* CBLIncrementalStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CBLIncrementalStore.m; sourceTree = "<group>"; };
+		E5B53E7A1CB7E4BE00248E7B /* 1000.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1000.jpeg; sourceTree = "<group>"; };
 		F63394909BE8EB500DDAC54A /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -103,6 +105,7 @@
 				E56C00D51CB698BC007A37D5 /* LaunchScreen.storyboard */,
 				E56C00D81CB698BC007A37D5 /* Info.plist */,
 				E56C00C71CB698BC007A37D5 /* CBLINCTest.xcdatamodeld */,
+				E5B53E7A1CB7E4BE00248E7B /* 1000.jpeg */,
 				E56C00C11CB698BC007A37D5 /* Supporting Files */,
 			);
 			name = BatchTest_CBLIncrementalStore;
@@ -179,6 +182,7 @@
 			files = (
 				E56C00D71CB698BC007A37D5 /* LaunchScreen.storyboard in Resources */,
 				E56C00D41CB698BC007A37D5 /* Assets.xcassets in Resources */,
+				E5B53E7B1CB7E4BE00248E7B /* 1000.jpeg in Resources */,
 				E56C00D21CB698BC007A37D5 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

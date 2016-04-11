@@ -22,18 +22,18 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
-
+    
     self.detailViewController = (DetailViewController*)[[self.splitViewController.viewControllers lastObject] topViewController];
-
+    
     if ([[NSUserDefaults standardUserDefaults] boolForKey:kDidSeedDatabase] == NO) {
-
+        
         NSManagedObjectContext* context = [self.fetchedResultsController managedObjectContext];
-
+        
         // Seeding db
         for (NSUInteger i = 0; i < 10000; i++) {
             NSLog(@"i : %lu", (unsigned long)i);
             [self insertNewObjectNumber:i];
-
+            
             if (i % 100 == 0) {
                 NSError* error = nil;
                 if (![context save:&error]) {
@@ -42,7 +42,7 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
                 }
             }
         }
-
+        
         // Save the context.
         NSError* error = nil;
         if (![context save:&error]) {
@@ -50,7 +50,7 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
             abort();
         }
         NSLog(@"Finished seeding database");
-
+        
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kDidSeedDatabase];
     }
 }
@@ -65,19 +65,29 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+    
+    
 }
 
 - (void)insertNewObjectNumber:(NSUInteger)number
 {
+    
+    NSURL* modelURL = [[NSBundle mainBundle] URLForResource:@"1000" withExtension:@"jpeg"];
+    NSData *data = [NSData dataWithContentsOfURL:modelURL];
+    
     NSManagedObjectContext* context = [self.fetchedResultsController managedObjectContext];
     NSEntityDescription* entity = [[self.fetchedResultsController fetchRequest] entity];
     NSManagedObject* newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name]
                                                                       inManagedObjectContext:context];
-
+    
+    NSManagedObject *image = [NSEntityDescription insertNewObjectForEntityForName:@"Image" inManagedObjectContext:context];
+    [image setValue:data forKey:@"image"];
+    
     NSString* name = [NSString stringWithFormat:@"Contact %lu", (unsigned long)number];
-
+    
     [newManagedObject setValue:name forKey:@"name"];
-
+    [newManagedObject setValue:image forKey:@"image"];
+    
     // Save the context.
     NSError* error = nil;
     if (![context save:&error]) {
@@ -93,9 +103,9 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath* indexPath = [self.tableView indexPathForSelectedRow];
         NSManagedObject* object =
-            [[self fetchedResultsController] objectAtIndexPath:indexPath];
+        [[self fetchedResultsController] objectAtIndexPath:indexPath];
         DetailViewController* controller = (DetailViewController*)[
-            [segue destinationViewController] topViewController];
+                                                                   [segue destinationViewController] topViewController];
         [controller setDetailItem:object];
         controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
         controller.navigationItem.leftItemsSupplementBackButton = YES;
@@ -126,6 +136,14 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
     return cell;
 }
 
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSManagedObject* object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+    NSManagedObjectContext* context = [self.fetchedResultsController managedObjectContext];
+    
+    [context refreshObject:object mergeChanges:NO];
+}
+
 - (BOOL)tableView:(UITableView*)tableView canEditRowAtIndexPath:(NSIndexPath*)indexPath
 {
     // Return NO if you do not want the specified item to be editable.
@@ -137,7 +155,7 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSManagedObjectContext* context = [self.fetchedResultsController managedObjectContext];
         [context deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
-
+        
         NSError* error = nil;
         if (![context save:&error]) {
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -149,6 +167,11 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
 - (void)configureCell:(UITableViewCell*)cell
            withObject:(NSManagedObject*)object
 {
+    
+    NSManagedObject *image = [object valueForKey:@"image"];
+    NSData *data = [image valueForKey:@"image"];
+    
+    cell.imageView.image = [UIImage imageWithData:data];
     cell.textLabel.text = [[object valueForKey:@"name"] description];
 }
 
@@ -159,20 +182,21 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
     if (_fetchedResultsController != nil) {
         return _fetchedResultsController;
     }
-
+    
     NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
     NSEntityDescription* entity = [NSEntityDescription entityForName:@"Contact" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
-
+    
     // Set the batch size to a suitable number.
     [fetchRequest setFetchBatchSize:20];
-
+    [fetchRequest setIncludesPropertyValues:NO];
+    
     // Edit the sort key as appropriate.
     NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES];
-
+    
     [fetchRequest setSortDescriptors:@[ sortDescriptor ]];
-
+    
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
     NSFetchedResultsController* aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
@@ -181,13 +205,13 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
                                                                                                            cacheName:@"Master"];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
-
+    
     NSError* error = nil;
     if (![self.fetchedResultsController performFetch:&error]) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         abort();
     }
-
+    
     return _fetchedResultsController;
 }
 
@@ -202,18 +226,18 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
      forChangeType:(NSFetchedResultsChangeType)type
 {
     switch (type) {
-    case NSFetchedResultsChangeInsert:
-        [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex]
-                      withRowAnimation:UITableViewRowAnimationFade];
-        break;
-
-    case NSFetchedResultsChangeDelete:
-        [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex]
-                      withRowAnimation:UITableViewRowAnimationFade];
-        break;
-
-    default:
-        return;
+        case NSFetchedResultsChangeInsert:
+            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex]
+                          withRowAnimation:UITableViewRowAnimationFade];
+            break;
+            
+        case NSFetchedResultsChangeDelete:
+            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex]
+                          withRowAnimation:UITableViewRowAnimationFade];
+            break;
+            
+        default:
+            return;
     }
 }
 
@@ -224,26 +248,26 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
       newIndexPath:(NSIndexPath*)newIndexPath
 {
     UITableView* tableView = self.tableView;
-
+    
     switch (type) {
-    case NSFetchedResultsChangeInsert:
-        [tableView insertRowsAtIndexPaths:@[ newIndexPath ]
-                         withRowAnimation:UITableViewRowAnimationFade];
-        break;
-
-    case NSFetchedResultsChangeDelete:
-        [tableView deleteRowsAtIndexPaths:@[ indexPath ]
-                         withRowAnimation:UITableViewRowAnimationFade];
-        break;
-
-    case NSFetchedResultsChangeUpdate:
-        [self configureCell:[tableView cellForRowAtIndexPath:indexPath]
-                 withObject:anObject];
-        break;
-
-    case NSFetchedResultsChangeMove:
-        [tableView moveRowAtIndexPath:indexPath toIndexPath:newIndexPath];
-        break;
+        case NSFetchedResultsChangeInsert:
+            [tableView insertRowsAtIndexPaths:@[ newIndexPath ]
+                             withRowAnimation:UITableViewRowAnimationFade];
+            break;
+            
+        case NSFetchedResultsChangeDelete:
+            [tableView deleteRowsAtIndexPaths:@[ indexPath ]
+                             withRowAnimation:UITableViewRowAnimationFade];
+            break;
+            
+        case NSFetchedResultsChangeUpdate:
+            [self configureCell:[tableView cellForRowAtIndexPath:indexPath]
+                     withObject:anObject];
+            break;
+            
+        case NSFetchedResultsChangeMove:
+            [tableView moveRowAtIndexPath:indexPath toIndexPath:newIndexPath];
+            break;
     }
 }
 
