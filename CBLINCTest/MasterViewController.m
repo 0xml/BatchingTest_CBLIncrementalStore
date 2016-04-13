@@ -29,6 +29,8 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
         
         NSManagedObjectContext* context = [self.fetchedResultsController managedObjectContext];
         
+        [self.tableView beginUpdates];
+        
         // Seeding db
         for (NSUInteger i = 0; i < 10000; i++) {
             NSLog(@"i : %lu", (unsigned long)i);
@@ -50,6 +52,8 @@ NSString* const kDidSeedDatabase = @"kDidSeedDatabase";
             abort();
         }
         NSLog(@"Finished seeding database");
+        
+        [self.tableView endUpdates];
         
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kDidSeedDatabase];
     }
